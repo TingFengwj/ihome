@@ -13,6 +13,7 @@ manager.add_command('db', MigrateCommand)
 
 
 # 为flask补充csrf防护机制
+"""test"""
 
 
 
