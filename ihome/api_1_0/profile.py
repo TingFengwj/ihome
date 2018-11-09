@@ -11,7 +11,7 @@ from . import api
 from ihome import constants, db
 
 
-@api.route("/users/avatar",methods=["POST"])
+@api.route("/users/avatar", methods=["POST"])
 @login_required
 def set_user_avatar():
     """设置用户头像"""
@@ -30,16 +30,17 @@ def set_user_avatar():
         return jsonify(errno=RET.THIRDERR, errmsg="第三方错误")
     # 将文件名信息存在数据库中
     try:
-        User.query.filter_by(id=user_id).update({"avatar_url":file_name})
+        User.query.filter_by(id=user_id).update({"avatar_url": file_name})
         db.session.commit()
     except Exception as e:
         current_app.logger.error(e)
         return jsonify(errno=RET.DBERR, errmsg="保存头像信息失败")
     avatar_url = constants.QINIU_URL_DOMAIN + file_name
     # 返回值
-    return jsonify(errno=RET.OK, errmsg="保存头像成功", data={"avatar_url":avatar_url})
+    return jsonify(errno=RET.OK, errmsg="保存头像成功", data={"avatar_url": avatar_url})
 
-@api.route("/users/get_image",methods=["GET"])
+
+@api.route("/users/get_image", methods=["GET"])
 @login_required
 def get_image():
     user_id = g.user_id
@@ -49,9 +50,9 @@ def get_image():
         avatar_url = user.avatar_url
     except Exception as e:
         current_app.logger.error(e)
-        return jsonify(errno=RET.DBERR,errmsg="查询不出数据")
-    avatar_url = constants.QINIU_URL_DOMAIN +avatar_url
-    return jsonify(errno=RET.OK,errmsg="ok", data={"avatar_url":avatar_url})
+        return jsonify(errno=RET.DBERR, errmsg="查询不出数据")
+    avatar_url = constants.QINIU_URL_DOMAIN + avatar_url
+    return jsonify(errno=RET.OK, errmsg="ok", data={"avatar_url": avatar_url})
 
 
 @api.route("/user/name", methods=["PUT"])
@@ -66,7 +67,7 @@ def change_user_name():
     if not req_data:
         return jsonify(errno=RET.PARAMERR, errmsg="参数不完整")
 
-    name = req_data.get("name") # 用户想要设置的名字
+    name = req_data.get("name")  # 用户想要设置的名字
 
     if not name:
         return jsonify(errno=RET.PARAMERR, errmsg="名字不能为空")
@@ -81,11 +82,11 @@ def change_user_name():
         return jsonify(errno=RET.DBERR, errmsg="设置用户错误")
 
     # 修改redis中的name字段
-    session["name"]=name
-    return jsonify(errno=RET.OK, errmsg="ok", data={"name":name})
+    session["name"] = name
+    return jsonify(errno=RET.OK, errmsg="ok", data={"name": name})
 
 
-@api.route("/user",methods=["GET"])
+@api.route("/user", methods=["GET"])
 @login_required
 def get_user_profile():
     """获取个人信息"""
@@ -101,6 +102,7 @@ def get_user_profile():
         return jsonify(errno=RET.NODATA, errmsg="无效操作")
 
     return jsonify(errno=RET.OK, errmsg="OK", data=user.to_dict())
+
 
 @api.route("/user/auth", methods=["GET"])
 @login_required
@@ -119,6 +121,7 @@ def get_user_auth():
         return jsonify(errno=RET.NODATA, errmsg="无效操作")
 
     return jsonify(errno=RET.OK, errmsg="OK", data=user.auth_to_dict())
+
 
 @api.route("/user/auth", methods=["POST"])
 @login_required
@@ -140,7 +143,7 @@ def set_user_auth():
 
     # 保存用户的姓名与身份证号
     try:
-        User.query.filter_by(id=user_id, real_name=None, id_card=None)\
+        User.query.filter_by(id=user_id, real_name=None, id_card=None) \
             .update({"real_name": real_name, "id_card": id_card})
         db.session.commit()
     except Exception as e:
@@ -149,4 +152,3 @@ def set_user_auth():
         return jsonify(errno=RET.DBERR, errmsg="保存用户实名信息失败")
 
     return jsonify(errno=RET.OK, errmsg="OK")
-

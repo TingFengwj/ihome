@@ -36,7 +36,7 @@ def register():
     """业务逻辑"""
     # 获取真是的短信验证码
     try:
-        real_sms_code = redis_store.get("sms_code_%s"% mobile)
+        real_sms_code = redis_store.get("sms_code_%s" % mobile)
     except Exception as e:
         current_app.logger.error(e)
         resp = {
@@ -45,7 +45,7 @@ def register():
         }
         return jsonify(resp)
     # 判断短信的验证码是否过期
-    if real_sms_code is  None:
+    if real_sms_code is None:
         resp = {
             "errno": RET.NODATA,
             "errmsg": "短信验证码过期",
@@ -60,7 +60,7 @@ def register():
         return jsonify(resp)
     # 删除短信验证码
     try:
-        redis_store.delete("sms_code_%s"%mobile)
+        redis_store.delete("sms_code_%s" % mobile)
     except Exception as e:
         current_app.logger.error(e)
     # 判断用户的手机号是否已经注册
@@ -109,6 +109,7 @@ def register():
     }
     return jsonify(resp)
     # 返回值
+
 
 @api.route("/sessions", methods=["POST"])
 def login():
@@ -189,5 +190,3 @@ def logout():
     # 清除session数据
     session.clear()
     return jsonify(errno=RET.OK, errmsg="OK")
-
-

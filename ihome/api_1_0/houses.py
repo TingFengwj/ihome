@@ -9,7 +9,6 @@ from ihome.utils.response_code import RET
 from . import api
 
 
-
 @api.route("/areas")
 def get_area_info():
     """获取城区信息"""
@@ -72,6 +71,7 @@ def get_user_houses():
             houses_list.append(house.to_basic_dict())
     return jsonify(errno=RET.OK, errmsg="OK", data={"houses": houses_list})
 
+
 @api.route("/houses/info", methods=["POST"])
 @login_required
 def sava_house_info():
@@ -81,26 +81,27 @@ def sava_house_info():
     if house_data is None:
         return jsonify(errno=RET.PARAMERR, errmsg="参数错误")
 
-    title = house_data.get("title") # 房屋名称的标题
-    price = house_data.get("price") # 房屋价钱
-    area_id = house_data.get("area_id") # 房屋所属城区的编号
-    address = house_data.get("address") # 房屋地址
-    room_count = house_data.get("room_count") # 房屋包含的房间数目
-    acreage = house_data.get("acreage") # 房屋面积
-    unit = house_data.get("unit") # 房间布局(几室几厅)
-    capacity = house_data.get("capacity") # 房屋容纳人数
-    beds = house_data.get("beds") # 房屋卧床数目
-    deposit = house_data.get("deposit") # 押金
-    min_days = house_data.get("min_days") # 最小入住天数
-    max_days = house_data.get("max_days") # 最大入住天数
+    title = house_data.get("title")  # 房屋名称的标题
+    price = house_data.get("price")  # 房屋价钱
+    area_id = house_data.get("area_id")  # 房屋所属城区的编号
+    address = house_data.get("address")  # 房屋地址
+    room_count = house_data.get("room_count")  # 房屋包含的房间数目
+    acreage = house_data.get("acreage")  # 房屋面积
+    unit = house_data.get("unit")  # 房间布局(几室几厅)
+    capacity = house_data.get("capacity")  # 房屋容纳人数
+    beds = house_data.get("beds")  # 房屋卧床数目
+    deposit = house_data.get("deposit")  # 押金
+    min_days = house_data.get("min_days")  # 最小入住天数
+    max_days = house_data.get("max_days")  # 最大入住天数
 
     # 校验参数
-    if not all([title, price, area_id, address, room_count, acreage, unit, capacity, beds, deposit, min_days, max_days]):
+    if not all(
+            [title, price, area_id, address, room_count, acreage, unit, capacity, beds, deposit, min_days, max_days]):
         return jsonify(errno=RET.PARAMERR, errmsg="参数不完整")
 
     try:
-        price = int(float(price)*100)
-        deposit = int(float(deposit)*100)
+        price = int(float(price) * 100)
+        deposit = int(float(deposit) * 100)
     except Exception as e:
         return jsonify(errno=RET.DBERR, errmsg="参数有误")
 
@@ -146,7 +147,7 @@ def sava_house_info():
         return jsonify(errno=RET.DBERR, errmsg="保存数据失败")
 
     # 返回
-    return jsonify(errno=RET.OK, errmsg="保存成功", data={"house_id":house.id})
+    return jsonify(errno=RET.OK, errmsg="保存成功", data={"house_id": house.id})
 
 
 @api.route("/houses/image", methods=["POST"])
@@ -214,7 +215,7 @@ def get_houses_index():
     if ret:
         current_app.logger.info("hit house index info redis")
         # 因为redi中保存的是json字符串, 所以直接进行字符串的拼接返回
-        return '{"errno":0, "errmsg":"OK","data":%s}'%ret, 200, {"Content-Type": "application/json"}
+        return '{"errno":0, "errmsg":"OK","data":%s}' % ret, 200, {"Content-Type": "application/json"}
     else:
         try:
             # 查询数据库, 返回房屋订单数目最多的五条数据
@@ -222,7 +223,7 @@ def get_houses_index():
         except Exception as e:
             current_app.logger.error(e)
             return jsonify(errno=RET.DBERR, errmsg="查询数据库失败")
-        if not  houses:
+        if not houses:
             return jsonify(errno=RET.NODATA, errmsg="查询无数据")
 
         houses_list = []
@@ -237,7 +238,8 @@ def get_houses_index():
                 redis_store.setex("home_page_data", constants.HOME_PAGE_DATA_REDIS_EXPIRES, json_houses)
             except Exception as e:
                 current_app.logger.error(e)
-            return '{"errno":0, "errmsg":"ok", "data":%s}' %json_houses, 200, {"Content-Type": "application/json"}
+            return '{"errno":0, "errmsg":"ok", "data":%s}' % json_houses, 200, {"Content-Type": "application/json"}
+
 
 # @api.route("/houses/<int:house_id>", methods=["GET"])
 # def get_house_detail(house_id):
@@ -305,7 +307,8 @@ def get_house_detail(house_id):
         ret = None
     if ret:
         current_app.logger.info("hit house info redis")
-        return '{"errno":"0", "errmsg":"OK", "data":{"user_id":%s, "house":%s}}' % (user_id, ret), 200, {"Content-Type": "application/json"}
+        return '{"errno":"0", "errmsg":"OK", "data":{"user_id":%s, "house":%s}}' % (user_id, ret), 200, {
+            "Content-Type": "application/json"}
 
     # 查询数据库
     try:
@@ -331,9 +334,6 @@ def get_house_detail(house_id):
     except Exception as e:
         current_app.logger.error(e)
 
-    resp = '{"errno":"0", "errmsg":"OK", "data":{"user_id":%s, "house":%s}}' % (user_id, json_house), 200, {"Content-Type": "application/json"}
+    resp = '{"errno":"0", "errmsg":"OK", "data":{"user_id":%s, "house":%s}}' % (user_id, json_house), 200, {
+        "Content-Type": "application/json"}
     return resp
-
-
-
-
